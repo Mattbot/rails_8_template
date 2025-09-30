@@ -20,9 +20,9 @@ x-base: &base
   # env_file:
   #   - docker/app.env
   volumes:
-    - "./:/app"
+    - "./:/rails"
     - gems:/usr/local/bundle
-    - sockets:/app/tmp/sockets
+    - sockets:/rails/tmp/sockets
   environment:
     APPLICATION_VERSION: ${APPLICATION_VERSION}
     MYSQL_HOST: db
@@ -30,7 +30,7 @@ x-base: &base
     MYSQL_USER: root
     MYSQL_PASSWORD: ""
   tmpfs:
-    - /app/public/assets
+    - /rails/public/assets
   networks:
     shared: {}
 
@@ -41,17 +41,13 @@ services:
       - db
     ports:
       - 3000:3000
-    links:
-      - nginx
     tmpfs:
       - /tmp
-    # command: ["/bin/bash", "-c", "script/start_puma_development.sh", "rails"]
 
   db:
     image: mysql:5.7
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
-      # - 33060:3306
       - 33062:3306
     volumes:
       - mysql-data:/var/lib/mysql/
@@ -59,20 +55,3 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: y
     networks:
       shared: {}
-
-  nginx:
-    image: nginx:stable-alpine
-    volumes:
-      # - ./docker/nginx/conf.d:/etc/nginx/conf.d
-      # - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - sockets:/tmp/sockets
-      # Replace with real SSL certificate:
-      # - "./ssl:/etc/nginx/certs"
-      # - ${HOME}/.ssl:/etc/nginx/certs
-    ports:
-      - "443:443"
-    networks:
-      shared: {}
-    tmpfs:
-      - /data/nginx/cache
-    command: /bin/sh -c "exec nginx -g 'daemon off;'"
