@@ -31,5 +31,12 @@
 
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "bin/setup --skip-server"
+  "postCreateCommand": "bin/setup --skip-server",
+
+  // Mount ssh credentials to the container, if needed. More info: https://containers.dev/implementors/json_reference/#mounts.
+  "mounts": [
+    "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.ssh/id_ed25519,target=/home/vscode/.ssh/id_ed25519,type=bind,consistency=cached"
+  ]
+]
 }
