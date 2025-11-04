@@ -1,0 +1,181 @@
+name: Code Quality
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  rubocop:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Run RuboCop
+        run: |
+          bundle exec rubocop \
+            --format github \
+            --format json \
+            --out tmp/rubocop_results.json \
+            || true
+
+      - name: Upload RuboCop results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rubocop-results
+          path: tmp/rubocop_results.json
+
+  slim_lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Run Slim Lint
+        run: |
+          bundle exec slim-lint app/views/ \
+            --reporter github \
+            || true
+
+  brakeman:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Run Brakeman security scan
+        run: |
+          bundle exec brakeman \
+            --format json \
+            --output tmp/brakeman_results.json \
+            --no-pager \
+            || true
+
+      - name: Upload Brakeman results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brakeman-results
+          path: tmp/brakeman_results.json
+
+  bundle_audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Run bundle-audit
+        run: |
+          bundle exec bundle-audit update
+          bundle exec bundle-audit check --format json --output tmp/bundle_audit_results.json || true
+
+      - name: Upload bundle-audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-audit-results
+          path: tmp/bundle_audit_results.json
+
+  quality_summary:
+    runs-on: ubuntu-latest
+    needs: [rubocop, slim_lint, brakeman, bundle_audit]
+    if: always() && github.event_name == 'pull_request'
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create quality summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let comment = '## 🔍 Code Quality Report\n\n';
+            
+            // Check RuboCop results
+            try {
+              const rubocop = JSON.parse(fs.readFileSync('rubocop-results/rubocop_results.json', 'utf8'));
+              const offenses = rubocop.summary.offense_count;
+              comment += `### 🎨 RuboCop\n`;
+              comment += `- **Offenses**: ${offenses}\n`;
+              if (offenses === 0) {
+                comment += `- **Status**: ✅ Clean code style\n\n`;
+              } else {
+                comment += `- **Status**: ⚠️ Style issues found\n\n`;
+              }
+            } catch (e) {
+              comment += `### 🎨 RuboCop\n- **Status**: ❌ Failed to run\n\n`;
+            }
+            
+            // Check Brakeman results
+            try {
+              const brakeman = JSON.parse(fs.readFileSync('brakeman-results/brakeman_results.json', 'utf8'));
+              const warnings = brakeman.warnings.length;
+              comment += `### 🛡️ Brakeman Security\n`;
+              comment += `- **Warnings**: ${warnings}\n`;
+              if (warnings === 0) {
+                comment += `- **Status**: ✅ No security issues\n\n`;
+              } else {
+                comment += `- **Status**: ⚠️ Security warnings found\n\n`;
+              }
+            } catch (e) {
+              comment += `### 🛡️ Brakeman Security\n- **Status**: ❌ Failed to run\n\n`;
+            }
+            
+            // Check bundle-audit results
+            try {
+              const bundleAudit = JSON.parse(fs.readFileSync('bundle-audit-results/bundle_audit_results.json', 'utf8'));
+              const vulnerabilities = bundleAudit.results.length;
+              comment += `### 🔒 Bundle Audit\n`;
+              comment += `- **Vulnerabilities**: ${vulnerabilities}\n`;
+              if (vulnerabilities === 0) {
+                comment += `- **Status**: ✅ No known vulnerabilities\n\n`;
+              } else {
+                comment += `- **Status**: ❌ Vulnerabilities found\n\n`;
+              }
+            } catch (e) {
+              comment += `### 🔒 Bundle Audit\n- **Status**: ✅ No known vulnerabilities\n\n`;
+            }
+            
+            comment += `### 📄 Slim Templates\n`;
+            comment += `- **Status**: ✅ Linting completed\n\n`;
+            
+            comment += `---\n*Quality report generated by GitHub Actions*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

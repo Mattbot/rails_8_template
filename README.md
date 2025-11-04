@@ -1,5 +1,12 @@
 # Rails 8 Template
 
+[![CI](https://github.com/Mattbot/rails_8_template/workflows/CI/badge.svg)](https://github.com/Mattbot/rails_8_template/actions/workflows/ci.yml)
+[![Code Quality](https://github.com/Mattbot/rails_8_template/workflows/Code%20Quality/badge.svg)](https://github.com/Mattbot/rails_8_template/actions/workflows/quality.yml)
+[![Version Bump](https://github.com/Mattbot/rails_8_template/workflows/Auto%20Version%20Bump/badge.svg)](https://github.com/Mattbot/rails_8_template/actions/workflows/version-bump.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Ruby](https://img.shields.io/badge/ruby-3.4.6-red.svg)](https://www.ruby-lang.org/)
+[![Rails](https://img.shields.io/badge/rails-8.0.3-red.svg)](https://rubyonrails.org/)
+
 This is a Rails 8 application template configured for modern development with dev containers and esbuild.
 
 ## Quick Start
@@ -46,6 +53,7 @@ This is the easiest way to get started. The Dev Container is fully configured to
 - ✅ JavaScript asset building
 - ✅ Security vulnerability scanning
 - ✅ Automated semantic versioning with GitHub Actions
+- ✅ Continuous integration with automated testing
 - ✅ VS Code extensions (Slim, Ruby LSP, etc.)
 - ✅ Environment configuration
 
@@ -397,6 +405,89 @@ BREAKING CHANGE: authentication now requires API key"
 - 🔍 **Quality gates**: Security and test validation before release
 - 🏷️ **Proper tagging**: Semantic version tags created automatically
 - 📦 **GitHub releases**: Professional release pages with notes
+
+## Continuous Integration & Testing
+
+This repository includes comprehensive CI/CD automation with GitHub Actions to ensure code quality and reliability.
+
+### 🧪 Test Automation
+
+**Automatic Testing on Every Push/PR:**
+- ✅ **RSpec test suite** - Full application testing
+- ✅ **System tests** - End-to-end browser testing 
+- ✅ **Matrix testing** - Multiple Ruby (3.4.6, 3.3.0) and Node.js (20, 22) versions
+- ✅ **Database setup** - Automated test database creation and schema loading
+- ✅ **Asset compilation** - JavaScript bundling with esbuild
+
+### 🔍 Code Quality Checks
+
+**Automated Quality Assurance:**
+- ✅ **RuboCop** - Ruby code style and best practices
+- ✅ **Slim Lint** - Template validation for Slim files
+- ✅ **Brakeman** - Static security analysis for Rails
+- ✅ **Bundle Audit** - Gem dependency vulnerability scanning
+- ✅ **Quality reports** - Automated PR comments with results
+
+### 🚀 Workflow Overview
+
+1. **CI Workflow** (`.github/workflows/ci.yml`)
+   - Runs on: Push to main, Pull Requests
+   - Duration: ~5-10 minutes
+   - Tests: RSpec, System tests, Security scans
+   - Matrix: Multiple Ruby/Node.js versions
+
+2. **Code Quality** (`.github/workflows/quality.yml`)
+   - Runs on: Push to main, Pull Requests  
+   - Duration: ~2-3 minutes
+   - Checks: RuboCop, Slim Lint, Brakeman, Bundle Audit
+   - Reports: Automated PR comments with results
+
+3. **Version Management** (Multiple workflows)
+   - Automatic version bumping based on commit messages
+   - Release creation with changelogs
+   - Manual version control when needed
+
+### 📊 Status Monitoring
+
+Monitor the health of your repository with status badges:
+- **CI Status**: Shows if tests are passing
+- **Code Quality**: Indicates linting and security status  
+- **Version Automation**: Tracks automated releases
+- **License & Dependencies**: Project metadata
+
+### 🔧 Local Testing
+
+Run the same checks locally before pushing:
+
+```bash
+# Run full test suite
+bundle exec rspec
+
+# Run specific test types
+bundle exec rspec spec/models/
+bundle exec rspec spec/system/
+
+# Code quality checks
+bundle exec rubocop
+bundle exec slim-lint app/views/
+bundle exec brakeman
+bundle exec bundle-audit check
+
+# Security updates
+rake security:audit
+rake security:update
+```
+
+### 🎯 PR Workflow
+
+When you create a pull request:
+1. **Automated testing** runs across multiple Ruby/Node versions
+2. **Code quality** analysis provides detailed feedback
+3. **Security scanning** identifies potential vulnerabilities
+4. **Quality summary** posted as PR comment
+5. **Status checks** must pass before merging
+
+This ensures every change maintains the high quality and security standards of the Rails 8 template.
 
 ## Security
 

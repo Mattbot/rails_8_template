@@ -1,6 +1,33 @@
 # GitHub Actions Workflows
 
-This repository includes several automated workflows:
+This repository includes several automated workflows for CI/CD, testing, and release management:
+
+## 🧪 CI (Continuous Integration)
+- **Trigger**: Push to main/master, Pull Requests
+- **Purpose**: Runs comprehensive test suite and security checks
+- **Duration**: ~5-10 minutes
+- **Matrix**: Ruby 3.4.6 & 3.3.0, Node.js 20 & 22
+- **Badge**: ![CI](https://github.com/Mattbot/rails_8_template/workflows/CI/badge.svg)
+
+**What it does:**
+- Runs RSpec test suite
+- Executes system tests with Chrome
+- Performs security scans (Brakeman, Bundle Audit)
+- Builds JavaScript assets with esbuild
+- Tests across multiple Ruby/Node.js versions
+
+## 🔍 Code Quality
+- **Trigger**: Push to main/master, Pull Requests  
+- **Purpose**: Automated code quality and style checking
+- **Duration**: ~2-3 minutes
+- **Badge**: ![Code Quality](https://github.com/Mattbot/rails_8_template/workflows/Code%20Quality/badge.svg)
+
+**What it does:**
+- RuboCop style and best practice checking
+- Slim template linting
+- Brakeman security analysis
+- Bundle Audit vulnerability scanning
+- Posts quality summary to PRs
 
 ## 🔄 Auto Version Bump
 - **Trigger**: Push to main/master branch
@@ -19,6 +46,8 @@ This repository includes several automated workflows:
 
 ## Workflow Files
 
+- `.github/workflows/ci.yml` - Comprehensive CI with testing and security
+- `.github/workflows/quality.yml` - Fast code quality checks  
 - `.github/workflows/version-bump.yml` - Automatic version bumping
 - `.github/workflows/release.yml` - Release creation and changelog generation  
 - `.github/workflows/manual-version-bump.yml` - Manual version management

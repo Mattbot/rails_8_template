@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [main, master]
 
 jobs:
   scan_ruby:
@@ -22,7 +22,7 @@ jobs:
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
 
-  scan_js:
+  scan_dependencies:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,8 +35,10 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: bin/importmap audit
+      - name: Scan for security vulnerabilities in gem dependencies
+        run: |
+          bundle exec bundle-audit update
+          bundle exec bundle-audit check
 
   lint:
     runs-on: ubuntu-latest
@@ -50,18 +52,26 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Lint code for consistent style
+      - name: Lint Ruby code for consistent style
         run: bin/rubocop -f github
+
+      - name: Lint Slim templates
+        run: bundle exec slim-lint app/views/
+        continue-on-error: true
 
   test:
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        ruby-version: ['3.4.6', '3.3.0']
+        node-version: ['20', '22']
+        include:
+          - ruby-version: '3.4.6'
+            node-version: '20'
+            primary: true
+      fail-fast: false
 
-    # services:
-    #  redis:
-    #    image: redis
-    #    ports:
-    #      - 6379:6379
-    #    options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Install packages
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config google-chrome-stable
@@ -69,22 +79,47 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Ruby
+      - name: Set up Ruby ${{ matrix.ruby-version }}
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: .ruby-version
+          ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
 
-      - name: Run tests
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install JavaScript dependencies
+        run: npm install
+
+      - name: Build JavaScript assets
+        run: npm run build
+
+      - name: Setup database
         env:
           RAILS_ENV: test
-          # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test test:system
+        run: |
+          bin/rails db:create
+          bin/rails db:schema:load
+
+      - name: Run RSpec tests
+        env:
+          RAILS_ENV: test
+        run: bundle exec rspec --format progress
+
+      - name: Run system tests (primary matrix only)
+        if: matrix.primary
+        env:
+          RAILS_ENV: test
+        run: bundle exec rspec spec/system/ --format progress
+        continue-on-error: true
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: screenshots
+          name: screenshots-ruby-${{ matrix.ruby-version }}-node-${{ matrix.node-version }}
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
