@@ -11,7 +11,10 @@
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/rails/devcontainer/features/activestorage": {},
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-    "ghcr.io/rails/devcontainer/features/sqlite3": {}
+    "ghcr.io/rails/devcontainer/features/sqlite3": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
   },
 
   "containerEnv": {
@@ -24,14 +27,36 @@
   "forwardPorts": [3000],
 
   // Configure tool-specific properties.
-  // "customizations": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "sianglim.slim",
+        "shopify.ruby-lsp", 
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-json"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll": "explicit"
+        },
+        "files.associations": {
+          "*.slim": "slim"
+        }
+      }
+    }
+  },
 
   // Uncomment to connect as root instead. More info: https://containers.dev/implementors/json_reference/#remoteUser.
   // "remoteUser": "root",
 
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "bin/setup --skip-server",
+  "postCreateCommand": ".devcontainer/setup.sh",
+
+  // Use 'postStartCommand' to run commands after the container starts.
+  "postStartCommand": "echo 'Container started! Run ./bin/dev to start the development server.'",
 
   // Mount ssh credentials to the container, if needed. More info: https://containers.dev/implementors/json_reference/#mounts.
   "mounts": [
