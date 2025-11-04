@@ -55,7 +55,7 @@ group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
-  gem "brakeman", require: false
+  gem "brakeman", "~> 7.1.1", require: false
 
   # Audit gem dependencies for security vulnerabilities [https://github.com/postmodern/bundler-audit]
   gem "bundler-audit", require: false
