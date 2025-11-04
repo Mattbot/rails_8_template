@@ -65,6 +65,12 @@ jobs:
             echo "No version bump needed"
           fi
 
+      - name: Get previous version for changelog
+        if: steps.version-type.outputs.type != 'none'
+        run: |
+          OLD_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "OLD_VERSION=${OLD_VERSION#v}" >> $GITHUB_ENV
+
       - name: Bump version
         if: steps.version-type.outputs.type != 'none'
         run: |
@@ -82,20 +88,16 @@ jobs:
 
       - name: Create GitHub Release
         if: steps.version-type.outputs.type != 'none'
-        uses: actions/create-release@v1
+        run: |
+          gh release create "v${{ env.NEW_VERSION }}" \
+            --title "Release v${{ env.NEW_VERSION }}" \
+            --notes "## What's Changed
+
+          Automated release based on conventional commit: ${{ github.event.head_commit.message }}
+
+          **Version Type:** ${{ steps.version-type.outputs.type }}
+          **Commit:** ${{ github.event.head_commit.id }}
+
+          Full Changelog: https://github.com/${{ github.repository }}/compare/v${{ env.OLD_VERSION }}...v${{ env.NEW_VERSION }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ env.NEW_VERSION }}
-          release_name: Release v${{ env.NEW_VERSION }}
-          body: |
-            ## What's Changed
-            
-            Automated release based on conventional commit: ${{ github.event.head_commit.message }}
-            
-            **Version Type:** ${{ steps.version-type.outputs.type }}
-            **Commit:** ${{ github.event.head_commit.id }}
-            
-            Full Changelog: https://github.com/${{ github.repository }}/compare/v${{ env.OLD_VERSION }}...v${{ env.NEW_VERSION }}
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

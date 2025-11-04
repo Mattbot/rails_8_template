@@ -80,30 +80,26 @@ jobs:
           git push origin "v${{ env.NEW_VERSION }}"
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
+        run: |
+          gh release create "v${{ env.NEW_VERSION }}" \
+            --title "Release v${{ env.NEW_VERSION }}" \
+            --notes "## 🚀 Manual Release v${{ env.NEW_VERSION }}
+
+          **Version Type:** ${{ github.event.inputs.version_type }}
+          **Previous Version:** ${{ steps.current-version.outputs.current }}
+          **Triggered by:** @${{ github.actor }}
+
+          ${{ github.event.inputs.release_notes || 'Manual release with no specific notes provided.' }}
+
+          ## ✅ Quality Checks
+          - Security audit: Passed
+          - Test suite: Passed
+
+          ## 🔗 Links
+          - [Full Changelog](https://github.com/${{ github.repository }}/compare/v${{ steps.current-version.outputs.current }}...v${{ env.NEW_VERSION }})
+          - [Commits](https://github.com/${{ github.repository }}/commits/v${{ env.NEW_VERSION }})"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ env.NEW_VERSION }}
-          release_name: Release v${{ env.NEW_VERSION }}
-          body: |
-            ## 🚀 Manual Release v${{ env.NEW_VERSION }}
-            
-            **Version Type:** ${{ github.event.inputs.version_type }}
-            **Previous Version:** ${{ steps.current-version.outputs.current }}
-            **Triggered by:** @${{ github.actor }}
-            
-            ${{ github.event.inputs.release_notes || 'Manual release with no specific notes provided.' }}
-            
-            ## ✅ Quality Checks
-            - Security audit: Passed
-            - Test suite: Passed
-            
-            ## 🔗 Links
-            - [Full Changelog](https://github.com/${{ github.repository }}/compare/v${{ steps.current-version.outputs.current }}...v${{ env.NEW_VERSION }})
-            - [Commits](https://github.com/${{ github.repository }}/commits/v${{ env.NEW_VERSION }})
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Output summary
         run: |
