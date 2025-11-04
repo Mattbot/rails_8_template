@@ -44,6 +44,7 @@ This is the easiest way to get started. The Dev Container is fully configured to
 - ✅ JavaScript dependencies (`npm install`) 
 - ✅ Database creation and migration
 - ✅ JavaScript asset building
+- ✅ Security vulnerability scanning
 - ✅ VS Code extensions (Slim, Ruby LSP, etc.)
 - ✅ Environment configuration
 
@@ -113,12 +114,14 @@ The following additional features have been added to the Rails 8 base install:
 - **slim**: Clean, minimal templating language
 - **slim_lint**: Linting for Slim templates  
 - **jsbundling-rails**: JavaScript bundling with esbuild
+- **bundler-audit**: Security vulnerability scanner for gems
 - **rspec-rails**: Testing framework (if added)
 
 ### Development Tools
 - **esbuild**: Fast JavaScript bundler replacing importmap
 - **Dev Container**: Containerized development environment
 - **Direnv**: Environment variable management
+- **bundler-audit**: Automatic security vulnerability scanning
 
 
 ## Configuration
@@ -145,6 +148,15 @@ yarn build
 **Run tests:**
 ```bash
 bundle exec rspec
+```
+
+**Security scanning:**
+```bash
+# Update vulnerability database and check
+rake security:check
+
+# Just update the database
+rake security:update
 ```
 
 ### Dev Containers
@@ -226,6 +238,41 @@ sudo apt install direnv
    direnv allow
    ```
 
+## Security
+
+This application includes automated security vulnerability scanning using `bundler-audit`:
+
+### Automatic Security Scanning
+
+**During Development:**
+- Security check runs automatically when starting `./bin/dev`
+- Vulnerability database is updated and checked during Dev Container setup
+- Continuous monitoring alerts you to new vulnerabilities
+
+**Available Commands:**
+```bash
+# Full security check with database update
+rake security:check
+
+# Update vulnerability database only
+rake security:update
+
+# Direct bundle-audit commands
+bundle exec bundle-audit update
+bundle exec bundle-audit check
+```
+
+**What it Checks:**
+- Known security vulnerabilities in your gem dependencies
+- Outdated gems with security patches available
+- Advisory database maintained by the Ruby security community
+
+**Integration Points:**
+- ✅ **Dev Container setup**: Automatic vulnerability check on first run
+- ✅ **Development server**: Continuous monitoring via `./bin/dev`
+- ✅ **Rake tasks**: Easy manual testing and CI/CD integration
+- ✅ **CI/CD ready**: Exit codes for automated pipeline failures
+
 ## Deployment
 
 This application is configured for deployment with:
@@ -276,3 +323,25 @@ bundle clean --force && bundle install
 # Reset database
 rails db:drop db:create db:migrate db:seed
 ```
+
+### Security Scanning Issues
+
+**Bundle-audit not found:**
+```bash
+# Reinstall the gem
+bundle install
+# Or install directly
+gem install bundler-audit
+```
+
+**Outdated vulnerability database:**
+```bash
+# Update the advisory database
+bundle exec bundle-audit update
+```
+
+**Security vulnerabilities found:**
+- Review the vulnerability details in the output
+- Update affected gems: `bundle update gem_name`
+- Check for patches or alternative gems
+- Consider temporary workarounds if no fix is available

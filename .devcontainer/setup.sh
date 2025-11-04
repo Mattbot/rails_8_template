@@ -32,6 +32,20 @@ fi
 echo "💎 Installing any additional gems..."
 bundle install
 
+# Update bundle-audit database and run security check
+echo "🔒 Updating security vulnerability database..."
+bundle exec bundle-audit update
+
+echo "🔍 Running security audit..."
+bundle exec bundle-audit check
+if [ $? -eq 0 ]; then
+    echo "✅ No security vulnerabilities found!"
+else
+    echo "⚠️  Security vulnerabilities detected. Check the output above."
+    echo "   Run 'rake security:update' to update the vulnerability database"
+    echo "   Run 'bundle update' to fix vulnerable gems"
+fi
+
 # Precompile assets for the first time
 echo "🎨 Precompiling assets..."
 bundle exec rails assets:precompile RAILS_ENV=development || echo "Asset precompilation skipped"

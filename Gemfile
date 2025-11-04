@@ -50,6 +50,9 @@ group :development, :test do
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
 
+  # Audit gem dependencies for security vulnerabilities [https://github.com/postmodern/bundler-audit]
+  gem "bundler-audit", require: false
+
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
