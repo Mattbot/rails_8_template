@@ -61,6 +61,7 @@
   // Mount ssh credentials to the container, if needed. More info: https://containers.dev/implementors/json_reference/#mounts.
   "mounts": [
     "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.ssh/id_ed25519,target=/home/vscode/.ssh/id_ed25519,type=bind,consistency=cached"
+    // Mount entire SSH directory to preserve all keys and configuration
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
   ]
 }

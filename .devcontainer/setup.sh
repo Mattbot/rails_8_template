@@ -3,6 +3,33 @@ set -e
 
 echo "🚀 Starting Rails 8 + esbuild Dev Container setup..."
 
+# Fix SSH directory ownership if it exists (mounted SSH keys create root-owned directories)
+# This is necessary because Docker mount operations create parent directories as root
+if [ -d "$HOME/.ssh" ]; then
+    echo "🔐 Fixing SSH directory ownership..."
+    sudo chown -R vscode:vscode "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+    if [ -f "$HOME/.ssh/id_ed25519" ]; then
+        chmod 600 "$HOME/.ssh/id_ed25519"
+    fi
+    if [ -f "$HOME/.ssh/id_rsa" ]; then
+        chmod 600 "$HOME/.ssh/id_rsa"
+    fi
+    # Generate public key if missing
+    if [ -f "$HOME/.ssh/id_ed25519" ] && [ ! -f "$HOME/.ssh/id_ed25519.pub" ]; then
+        ssh-keygen -y -f "$HOME/.ssh/id_ed25519" > "$HOME/.ssh/id_ed25519.pub"
+        chmod 644 "$HOME/.ssh/id_ed25519.pub"
+    fi
+    if [ -f "$HOME/.ssh/id_rsa" ] && [ ! -f "$HOME/.ssh/id_rsa.pub" ]; then
+        ssh-keygen -y -f "$HOME/.ssh/id_rsa" > "$HOME/.ssh/id_rsa.pub"
+        chmod 644 "$HOME/.ssh/id_rsa.pub"
+    fi
+    # Add GitHub to known_hosts if not already there
+    if [ ! -f "$HOME/.ssh/known_hosts" ] || ! grep -q "github.com" "$HOME/.ssh/known_hosts"; then
+        ssh-keyscan github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
+    fi
+fi
+
 # Run the standard Rails setup (without starting server)
 echo "📦 Running Rails setup..."
 bin/setup --skip-server
