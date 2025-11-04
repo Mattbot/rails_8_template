@@ -596,3 +596,5 @@ bundle exec bundle-audit update
 - Update affected gems: `bundle update gem_name`
 - Check for patches or alternative gems
 - Consider temporary workarounds if no fix is available
+
+bump
