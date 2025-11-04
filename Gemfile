@@ -40,6 +40,13 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
+# Security updates for known vulnerabilities
+gem "rack", ">= 3.2.3"  # Fix CVE-2025-61770, CVE-2025-61771, CVE-2025-61772, CVE-2025-61780, CVE-2025-61919
+gem "uri", ">= 1.0.4"   # Fix CVE-2025-61594
+
+# Template engine for generating semantic HTML
+gem "slim-rails"
+
 # User added. Keep sorted:
 gem "slim"
 
