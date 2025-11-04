@@ -1,0 +1,112 @@
+name: Manual Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      release_notes:
+        description: 'Custom release notes (optional)'
+        required: false
+        type: string
+
+jobs:
+  manual-version-bump:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.6'
+          bundler-cache: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          bundle install
+          npm install
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Get current version
+        id: current-version
+        run: |
+          CURRENT_VERSION=$(cat VERSION)
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Bump version
+        run: |
+          bundle exec rake version:${{ github.event.inputs.version_type }}
+          echo "NEW_VERSION=$(cat VERSION)" >> $GITHUB_ENV
+
+      - name: Run security audit
+        run: |
+          bundle exec rake security:audit
+
+      - name: Run tests
+        run: |
+          bundle exec rspec
+
+      - name: Commit and push changes
+        run: |
+          git add VERSION package.json
+          git commit -m "chore: manual version bump to ${{ env.NEW_VERSION }} (${{ github.event.inputs.version_type }})"
+          git tag -a "v${{ env.NEW_VERSION }}" -m "Manual release v${{ env.NEW_VERSION }}"
+          git push origin ${{ github.ref_name }}
+          git push origin "v${{ env.NEW_VERSION }}"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.NEW_VERSION }}
+          release_name: Release v${{ env.NEW_VERSION }}
+          body: |
+            ## 🚀 Manual Release v${{ env.NEW_VERSION }}
+            
+            **Version Type:** ${{ github.event.inputs.version_type }}
+            **Previous Version:** ${{ steps.current-version.outputs.current }}
+            **Triggered by:** @${{ github.actor }}
+            
+            ${{ github.event.inputs.release_notes || 'Manual release with no specific notes provided.' }}
+            
+            ## ✅ Quality Checks
+            - Security audit: Passed
+            - Test suite: Passed
+            
+            ## 🔗 Links
+            - [Full Changelog](https://github.com/${{ github.repository }}/compare/v${{ steps.current-version.outputs.current }}...v${{ env.NEW_VERSION }})
+            - [Commits](https://github.com/${{ github.repository }}/commits/v${{ env.NEW_VERSION }})
+          draft: false
+          prerelease: false
+
+      - name: Output summary
+        run: |
+          echo "## 🎉 Version Bump Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Previous Version:** ${{ steps.current-version.outputs.current }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **New Version:** ${{ env.NEW_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Bump Type:** ${{ github.event.inputs.version_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release:** [v${{ env.NEW_VERSION }}](https://github.com/${{ github.repository }}/releases/tag/v${{ env.NEW_VERSION }})" >> $GITHUB_STEP_SUMMARY

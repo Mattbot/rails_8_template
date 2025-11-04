@@ -45,6 +45,7 @@ This is the easiest way to get started. The Dev Container is fully configured to
 - ✅ Database creation and migration
 - ✅ JavaScript asset building
 - ✅ Security vulnerability scanning
+- ✅ Automated semantic versioning with GitHub Actions
 - ✅ VS Code extensions (Slim, Ruby LSP, etc.)
 - ✅ Environment configuration
 
@@ -237,6 +238,165 @@ sudo apt install direnv
    ```bash
    direnv allow
    ```
+
+## Version Management
+
+This application follows [Semantic Versioning (SemVer)](https://semver.org/) principles with automated version management tools.
+
+### Current Version
+
+The current version is stored in the `VERSION` file and accessible throughout the application:
+
+```bash
+# Show current version
+rake version:show
+
+# Access in Rails console
+APP_VERSION            # => "1.0.0"
+AppVersion.current     # => "1.0.0"
+AppVersion.major       # => 1
+AppVersion.minor       # => 0  
+AppVersion.patch       # => 0
+```
+
+### Version Endpoints
+
+**Health Check Endpoint:**
+- `GET /version` - Returns JSON with current version and timestamp
+- Useful for monitoring, debugging, and deployment verification
+
+```bash
+curl http://localhost:3000/version
+# => {"version":"1.0.0","timestamp":"2025-11-04 19:47:17 UTC"}
+```
+
+### Version Bumping
+
+Use rake tasks to bump versions automatically:
+
+```bash
+# Bump patch version (1.0.0 → 1.0.1)
+rake version:patch
+
+# Bump minor version (1.0.0 → 1.1.0) 
+rake version:minor
+
+# Bump major version (1.0.0 → 2.0.0)
+rake version:major
+```
+
+**What happens automatically:**
+- ✅ Updates `VERSION` file
+- ✅ Updates `package.json` version field
+- ✅ Provides git commands for committing and tagging
+- ✅ Maintains version consistency across the project
+
+**Recommended Workflow:**
+1. Make your changes
+2. Choose appropriate version bump level:
+   - **Patch**: Bug fixes, security updates
+   - **Minor**: New features, backward-compatible changes  
+   - **Major**: Breaking changes, API changes
+3. Run the version bump command
+4. Follow the suggested git commands to commit and tag
+
+```bash
+# Example workflow
+rake version:patch
+# => 📦 Updated VERSION file: 1.0.0 → 1.0.1
+# => 📦 Updated package.json: 1.0.0 → 1.0.1
+# => ✅ Version bumped to 1.0.1
+# => 💡 Don't forget to commit and tag this version:
+# =>    git add VERSION package.json
+# =>    git commit -m "Bump version to 1.0.1"
+# =>    git tag -a v1.0.1 -m "Version 1.0.1"
+
+git add VERSION package.json
+git commit -m "Bump version to 1.0.1"
+git tag -a v1.0.1 -m "Version 1.0.1"
+git push && git push --tags
+```
+
+### 🤖 Automated Version Management
+
+**GitHub Actions automatically handle versioning when you push to the main branch!**
+
+#### Conventional Commits
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) format for automatic version bumping:
+
+```bash
+# Patch version bump (1.0.0 → 1.0.1)
+git commit -m "fix: resolve authentication issue"
+git commit -m "chore: update dependencies"
+git commit -m "docs: improve setup instructions"
+
+# Minor version bump (1.0.0 → 1.1.0) 
+git commit -m "feat: add user dashboard"
+git commit -m "feat: implement email notifications"
+
+# Major version bump (1.0.0 → 2.0.0)
+git commit -m "feat!: redesign authentication system"
+git commit -m "fix!: remove deprecated API endpoints"
+git commit -m "feat: new API
+
+BREAKING CHANGE: authentication now requires API key"
+```
+
+#### Automation Features
+
+**🔄 Automatic Version Bumping:**
+- Analyzes commit messages on push to main/master
+- Bumps version according to conventional commit rules
+- Updates `VERSION` file and `package.json`
+- Creates git tags automatically
+- Generates GitHub releases with changelogs
+
+**📋 Quality Checks:**
+- Runs security audit before releasing
+- Executes test suite to ensure quality
+- Only releases if all checks pass
+
+**🎛️ Manual Control:**
+- Manual workflow dispatch available in GitHub Actions tab
+- Choose version bump type (patch/minor/major)
+- Add custom release notes
+- Skip automation with `[skip version]` in commit message
+
+#### Workflow Triggers
+
+1. **Automatic (Recommended):**
+   ```bash
+   # Make your changes
+   git add .
+   git commit -m "feat: add amazing new feature"
+   git push origin main
+   # 🤖 GitHub Actions automatically:
+   # ✅ Bumps version to 1.1.0
+   # ✅ Creates tag v1.1.0  
+   # ✅ Generates release with changelog
+   ```
+
+2. **Manual Trigger:**
+   - Go to GitHub → Actions → "Manual Version Bump"
+   - Click "Run workflow" 
+   - Select version type and add notes
+   - 🤖 Automated version bump and release
+
+3. **Skip Automation:**
+   ```bash
+   git commit -m "docs: update README [skip version]"
+   # No version bump occurs
+   ```
+
+#### Benefits
+
+- 🚀 **Zero-friction releases**: Just commit with conventional format
+- 📊 **Consistent versioning**: No manual version management needed
+- 📝 **Automatic changelogs**: Generated from commit history
+- 🔍 **Quality gates**: Security and test validation before release
+- 🏷️ **Proper tagging**: Semantic version tags created automatically
+- 📦 **GitHub releases**: Professional release pages with notes
 
 ## Security
 

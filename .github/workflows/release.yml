@@ -1,0 +1,99 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.6'
+          bundler-cache: true
+
+      - name: Get version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Get previous tag
+        id: prev-tag
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 ${{ steps.version.outputs.tag }}^ 2>/dev/null || echo "")
+          echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          if [ -n "${{ steps.prev-tag.outputs.prev_tag }}" ]; then
+            echo "## 🚀 What's Changed" > changelog.md
+            echo "" >> changelog.md
+            
+            # Get commits between tags
+            git log ${{ steps.prev-tag.outputs.prev_tag }}..${{ steps.version.outputs.tag }} \
+              --pretty=format:"* %s (%h)" \
+              --no-merges \
+              | grep -E "^\\* (feat|fix|chore|docs|style|refactor|test)" \
+              >> changelog.md || true
+              
+            if [ ! -s changelog.md ] || [ $(wc -l < changelog.md) -le 2 ]; then
+              echo "* Initial release" >> changelog.md
+            fi
+          else
+            echo "## 🚀 Initial Release" > changelog.md
+            echo "" >> changelog.md
+            echo "This is the first release of the Rails 8 Template with:" >> changelog.md
+            echo "* Modern Rails 8 setup with esbuild" >> changelog.md
+            echo "* Slim template engine" >> changelog.md
+            echo "* Security scanning with bundler-audit" >> changelog.md
+            echo "* Automated versioning system" >> changelog.md
+            echo "* Development container configuration" >> changelog.md
+          fi
+          
+          echo "" >> changelog.md
+          echo "## 🛠️ Technical Details" >> changelog.md
+          echo "* **Version**: ${{ steps.version.outputs.version }}" >> changelog.md
+          echo "* **Rails**: 8.0.3" >> changelog.md
+          echo "* **Ruby**: 3.4.6" >> changelog.md
+          echo "* **Node**: Latest LTS" >> changelog.md
+
+      - name: Run security audit
+        run: |
+          bundle exec rake security:audit
+          echo "✅ Security audit passed" >> changelog.md
+
+      - name: Run tests
+        run: |
+          bundle exec rspec
+          echo "✅ Test suite passed" >> changelog.md
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          release_name: Release ${{ steps.version.outputs.tag }}
+          body_path: changelog.md
+          draft: false
+          prerelease: false
+
+      - name: Update repository topics
+        run: |
+          gh api --method PUT /repos/${{ github.repository }}/topics \
+            --field names='["rails","rails8","template","esbuild","slim","security","automation","semantic-versioning"]' \
+            --header "Accept: application/vnd.github.v3+json"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

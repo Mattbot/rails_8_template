@@ -1,7 +1,20 @@
 {
-  "name": "app",
+  "name": "rails-8-template",
+  "version": "1.0.0",
+  "description": "Modern Rails 8 application template with esbuild, Slim templates, security scanning, and development automation",
   "private": true,
   "scripts": {
     "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets"
-  }
+  },
+  "keywords": [
+    "rails",
+    "rails8",
+    "template",
+    "esbuild",
+    "slim",
+    "security",
+    "development"
+  ],
+  "author": "Matt Ridenour <mattridenour@gmail.com>",
+  "license": "MIT"
 }

@@ -1,0 +1,98 @@
+name: Auto Version Bump
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore:
+      - 'VERSION'
+      - 'package.json'
+      - '.github/**'
+      - 'README.md'
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip version]')"
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.6'
+          bundler-cache: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          bundle install
+          npm install
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Determine version bump type
+        id: version-type
+        run: |
+          commit_message="${{ github.event.head_commit.message }}"
+          echo "Commit message: $commit_message"
+          
+          if echo "$commit_message" | grep -qi "BREAKING CHANGE\|^feat!:\|^fix!:\|^chore!:"; then
+            echo "type=major" >> $GITHUB_OUTPUT
+            echo "Version bump: major (breaking change)"
+          elif echo "$commit_message" | grep -qi "^feat:"; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+            echo "Version bump: minor (new feature)"
+          elif echo "$commit_message" | grep -qi "^fix:\|^chore:\|^docs:\|^style:\|^refactor:\|^test:"; then
+            echo "type=patch" >> $GITHUB_OUTPUT
+            echo "Version bump: patch (fix/maintenance)"
+          else
+            echo "type=none" >> $GITHUB_OUTPUT
+            echo "No version bump needed"
+          fi
+
+      - name: Bump version
+        if: steps.version-type.outputs.type != 'none'
+        run: |
+          bundle exec rake version:${{ steps.version-type.outputs.type }}
+          echo "NEW_VERSION=$(cat VERSION)" >> $GITHUB_ENV
+
+      - name: Commit and push changes
+        if: steps.version-type.outputs.type != 'none'
+        run: |
+          git add VERSION package.json
+          git commit -m "chore: bump version to ${{ env.NEW_VERSION }} [skip version]"
+          git tag -a "v${{ env.NEW_VERSION }}" -m "Version ${{ env.NEW_VERSION }}"
+          git push origin ${{ github.ref_name }}
+          git push origin "v${{ env.NEW_VERSION }}"
+
+      - name: Create GitHub Release
+        if: steps.version-type.outputs.type != 'none'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.NEW_VERSION }}
+          release_name: Release v${{ env.NEW_VERSION }}
+          body: |
+            ## What's Changed
+            
+            Automated release based on conventional commit: ${{ github.event.head_commit.message }}
+            
+            **Version Type:** ${{ steps.version-type.outputs.type }}
+            **Commit:** ${{ github.event.head_commit.id }}
+            
+            Full Changelog: https://github.com/${{ github.repository }}/compare/v${{ env.OLD_VERSION }}...v${{ env.NEW_VERSION }}
+          draft: false
+          prerelease: false
