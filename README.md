@@ -59,40 +59,7 @@ This is the easiest way to get started. The Dev Container is fully configured to
 
 #### Option 2: Manual Linux Environment Setup
 
-If you prefer to set up the environment manually or aren't using Dev Containers:
-   
-   **Install Node.js (using fnm - Fast Node Manager)**
-   ```bash
-   curl -fsSL https://fnm.vercel.app/install | bash
-   source ~/.bashrc
-   fnm install --lts
-   fnm use lts-latest
-   ```
-
-   **Install Ruby dependencies**
-   ```bash
-   bundle install
-   ```
-
-   **Install JavaScript dependencies**
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-
-4. **Database Setup**
-   ```bash
-   rails db:create
-   rails db:migrate
-   rails db:seed
-   ```
-
-5. **Start the Development Server**
-   ```bash
-   ./bin/dev
-   ```
-   This starts both the Rails server and esbuild in watch mode.
+For manual Linux setup instructions, see [LINUX_SETUP.md](LINUX_SETUP.md).
 
 ## Technology Stack
 
@@ -205,47 +172,32 @@ This Rails application includes a fully configured Dev Container that automatica
 
 [Getting Started with Dev Containers](https://guides.rubyonrails.org/getting_started_with_devcontainer.html)
 
-### Direnv (Optional)
+#### Direnv Integration
 
-Several environment variables necessary to run this project in Docker can be loaded via 
-Direnv. Direnv allows you to dynamically load environment variables into your shell environment
-relative to your current path. If you change to a directory with a `.envrc`,
-direnv will load those variables into your shell and remove them when you change
-directories out of that directory's path.
+The Dev Container includes automatic direnv setup for environment variable management:
 
-**Installation:**
+**Automatic Configuration:**
+- ✅ **Direnv installed**: Pre-installed via dev container features
+- ✅ **Bash hook configured**: Automatically added to `~/.bashrc` for the vscode user
+- ✅ **Environment loading**: `.envrc` files are automatically allowed and loaded
+- ✅ **Zero setup required**: Works immediately when container starts
 
-*Linux/Ubuntu:*
-```bash 
-sudo apt install direnv
-```
-
-*macOS:*
-```bash 
-brew install direnv
-``` 
-
-*Windows WSL2:*
+**Usage:**
 ```bash
-sudo apt install direnv
+# .envrc file is automatically created from .envrc.example (if present)
+# Environment variables are loaded automatically when you cd into the project
+# No manual direnv allow needed - handled during container setup
 ```
 
-**Setup:**
-1. Copy the example file:
-   ```bash 
-   cp .envrc.example .envrc
-   ```
+**Benefits:**
+- 🔄 **Automatic loading**: Environment variables load when entering the project directory
+- 🔒 **Secure**: Per-project environment isolation
+- 🚀 **Development ready**: Database URLs, API keys, and other secrets properly managed
+- 🔧 **Container optimized**: Works seamlessly with dev container lifecycle
 
-2. Add the direnv hook to your shell:
-   ```bash 
-   echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
-   source ~/.bashrc
-   ```
+### Environment Setup
 
-3. Edit `.envrc` with your values and activate:
-   ```bash
-   direnv allow
-   ```
+For Linux environment setup without Dev Containers, see [LINUX_SETUP.md](LINUX_SETUP.md).
 
 ## Version Management
 
@@ -457,26 +409,7 @@ Monitor the health of your repository with status badges:
 
 ### 🔧 Local Testing
 
-Run the same checks locally before pushing:
-
-```bash
-# Run full test suite
-bundle exec rspec
-
-# Run specific test types
-bundle exec rspec spec/models/
-bundle exec rspec spec/system/
-
-# Code quality checks
-bundle exec rubocop
-bundle exec slim-lint app/views/
-bundle exec brakeman
-bundle exec bundle-audit check
-
-# Security updates
-rake security:audit
-rake security:update
-```
+For detailed testing commands and troubleshooting, see [LINUX_SETUP.md](LINUX_SETUP.md).
 
 ### 🎯 PR Workflow
 
@@ -551,50 +484,6 @@ For production deployment, JavaScript assets will be automatically built during 
 - Check `package.json` scripts section
 - Verify esbuild is installed: `npm list esbuild`
 
-### Manual Setup Issues
+### Linux Setup Issues
 
-**Node.js not found:**
-```bash
-# Reload shell configuration
-source ~/.bashrc
-# Or reinstall fnm
-curl -fsSL https://fnm.vercel.app/install | bash
-```
-
-**Bundle install fails:**
-```bash
-# Update RubyGems
-gem update --system
-# Clean and retry
-bundle clean --force && bundle install
-```
-
-**Database issues:**
-```bash
-# Reset database
-rails db:drop db:create db:migrate db:seed
-```
-
-### Security Scanning Issues
-
-**Bundle-audit not found:**
-```bash
-# Reinstall the gem
-bundle install
-# Or install directly
-gem install bundler-audit
-```
-
-**Outdated vulnerability database:**
-```bash
-# Update the advisory database
-bundle exec bundle-audit update
-```
-
-**Security vulnerabilities found:**
-- Review the vulnerability details in the output
-- Update affected gems: `bundle update gem_name`
-- Check for patches or alternative gems
-- Consider temporary workarounds if no fix is available
-
-bump
+For Linux-specific troubleshooting, see [LINUX_SETUP.md](LINUX_SETUP.md).

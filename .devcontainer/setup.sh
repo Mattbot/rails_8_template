@@ -53,6 +53,19 @@ if [ -f ".envrc.example" ]; then
         cp .envrc.example .envrc
         echo "📝 Copied .envrc.example to .envrc - please update with your values"
     fi
+    
+    # Configure direnv hook for vscode user
+    echo "🔧 Configuring direnv hook for bash..."
+    if ! grep -q 'eval "$(direnv hook bash)"' "$HOME/.bashrc"; then
+        echo 'eval "$(direnv hook bash)"' >> "$HOME/.bashrc"
+        echo "✅ Added direnv hook to ~/.bashrc"
+    fi
+    
+    # Allow the .envrc file if it exists
+    if [ -f ".envrc" ]; then
+        echo "🔓 Allowing .envrc file..."
+        direnv allow .
+    fi
 fi
 
 # Install additional gems if needed (for development)

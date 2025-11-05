@@ -14,7 +14,8 @@
     "ghcr.io/rails/devcontainer/features/sqlite3": {},
     "ghcr.io/devcontainers/features/node:1": {
       "version": "lts"
-    }
+    },
+    "ghcr.io/devcontainers-extra/features/direnv:1": {}
   },
 
   "containerEnv": {
