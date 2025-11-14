@@ -5,9 +5,14 @@ FROM ghcr.io/rails/devcontainer/images/ruby:$RUBY_VERSION
 # Install Node.js using fnm (Fast Node Manager)
 USER vscode
 
+# Install fnm and Node.js LTS in a single RUN command with proper PATH setup
 RUN curl -fsSL https://fnm.vercel.app/install | bash \
-    && echo 'eval "$(fnm env --use-on-cd)"' >> ~/.bashrc \
-    && bash -c "source ~/.bashrc && fnm install --lts && fnm use lts-latest"
+    && export PATH="/home/vscode/.local/share/fnm:$PATH" \
+    && eval "$(fnm env)" \
+    && fnm install --lts \
+    && fnm use lts-latest \
+    && echo 'export PATH="/home/vscode/.local/share/fnm:$PATH"' >> ~/.bashrc \
+    && echo 'eval "$(fnm env --use-on-cd)"' >> ~/.bashrc
 
 # Add fnm to PATH for all shells
 ENV PATH="/home/vscode/.local/share/fnm:$PATH"

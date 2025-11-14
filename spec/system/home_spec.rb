@@ -7,7 +7,7 @@ RSpec.describe "Home page", type: :system do
 
   it "displays the application information" do
     visit root_path
-    
+
     expect(page).to have_content(Rails.application.class.parent.name)
     expect(page).to have_content("Modern Rails 8 Application Template")
     expect(page).to have_content("Application Info")
@@ -16,14 +16,14 @@ RSpec.describe "Home page", type: :system do
 
   it "shows version information" do
     visit root_path
-    
+
     expect(page).to have_content("Version:")
     expect(page).to have_content(APP_VERSION)
   end
 
   it "displays quick action links" do
     visit root_path
-    
+
     expect(page).to have_link("Version API", href: version_path)
     expect(page).to have_link("Template Docs")
     expect(page).to have_link("Rails Guides")
