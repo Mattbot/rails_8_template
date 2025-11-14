@@ -7,7 +7,32 @@
 [![Ruby](https://img.shields.io/badge/ruby-3.4.6-red.svg)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/rails-8.0.3-red.svg)](https://rubyonrails.org/)
 
-This is a Rails 8 application template configured for modern development with dev containers and esbuild.
+**A modern, production-ready Rails 8 template for rapid application development.**
+
+This template provides a fully configured Rails 8 application with modern development tools, comprehensive testing, security features, and automated CI/CD workflows.
+
+## 🚀 Quick Start with Template
+
+### Use as GitHub Template (Recommended)
+1. **[Click "Use this template"](https://github.com/Mattbot/rails_8_template/generate)** on GitHub
+2. **Create your repository** with your desired name  
+3. **Clone and setup**:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/YOUR_PROJECT_NAME.git
+   cd YOUR_PROJECT_NAME
+   ./bin/template-setup YOUR_PROJECT_NAME
+   ```
+
+### Manual Clone
+```bash
+git clone https://github.com/Mattbot/rails_8_template.git my_new_app
+cd my_new_app
+./bin/template-setup my_new_app
+```
+
+The setup script automatically configures your new application and removes template-specific files.
+
+📚 **For detailed usage instructions, see [TEMPLATE_USAGE.md](TEMPLATE_USAGE.md)**
 
 ## Quick Start
 

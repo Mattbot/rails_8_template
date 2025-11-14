@@ -1,0 +1,93 @@
+#!/bin/bash
+set -e
+
+echo "🚀 Rails 8 Template Setup"
+echo "=========================="
+
+# Get project name from user
+if [ -z "$1" ]; then
+    echo "Usage: ./bin/template-setup PROJECT_NAME"
+    echo "Example: ./bin/template-setup my_awesome_app"
+    exit 1
+fi
+
+PROJECT_NAME="$1"
+ORIGINAL_NAME="rails_8_template"
+
+echo "📝 Setting up new Rails app: $PROJECT_NAME"
+
+# Function to replace text in files
+replace_in_file() {
+    local file="$1"
+    local search="$2" 
+    local replace="$3"
+    
+    if [ -f "$file" ]; then
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS
+            sed -i '' "s/$search/$replace/g" "$file"
+        else
+            # Linux
+            sed -i "s/$search/$replace/g" "$file"
+        fi
+        echo "✅ Updated $file"
+    fi
+}
+
+# Update application module name
+echo "🔧 Updating application configuration..."
+replace_in_file "config/application.rb" "module App" "module $(echo $PROJECT_NAME | sed 's/[^a-zA-Z0-9]//g' | sed 's/.*/\u&/')"
+
+# Update package.json
+echo "🔧 Updating package.json..."
+replace_in_file "package.json" "\"rails-8-template\"" "\"$PROJECT_NAME\""
+replace_in_file "package.json" "\"name\": \"rails-8-template\"" "\"name\": \"$PROJECT_NAME\""
+
+# Update README title
+echo "🔧 Updating README..."
+replace_in_file "README.md" "# Rails 8 Template" "# $PROJECT_NAME"
+replace_in_file "README.md" "rails_8_template" "$PROJECT_NAME"
+
+# Update docker-compose service names
+echo "🔧 Updating docker-compose.yml..."
+replace_in_file "docker-compose.yml" "rails_8_template" "$PROJECT_NAME"
+
+# Update dev container name
+echo "🔧 Updating dev container..."
+replace_in_file ".devcontainer/devcontainer.json" "\"name\": \"app\"" "\"name\": \"$PROJECT_NAME\""
+
+# Reset VERSION file
+echo "1.0.0" > VERSION
+
+# Generate new Rails secret
+echo "🔐 Generating new Rails credentials..."
+if [ -f "config/credentials.yml.enc" ]; then
+    rm config/credentials.yml.enc
+fi
+if [ -f "config/master.key" ]; then
+    rm config/master.key
+fi
+EDITOR=cat rails credentials:edit > /dev/null 2>&1 || true
+
+# Clean up git history (optional)
+echo "🧹 Cleaning up template artifacts..."
+rm -rf .git/
+git init
+git add .
+git commit -m "feat: initial commit for $PROJECT_NAME
+
+Generated from Rails 8 Template"
+
+# Clean up this setup script
+rm bin/template-setup
+
+echo ""
+echo "✅ Template setup complete!"
+echo ""
+echo "📋 Next steps:"
+echo "   1. Review and customize config/application.rb"
+echo "   2. Update README.md with your project details"
+echo "   3. Run ./bin/dev to start development"
+echo "   4. Set up your remote git repository"
+echo ""
+echo "🚀 Happy coding!"

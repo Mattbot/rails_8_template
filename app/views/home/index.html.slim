@@ -1,0 +1,106 @@
+doctype html
+html lang="en"
+  head
+    meta charset="utf-8"
+    meta name="viewport" content="width=device-width, initial-scale=1"
+    title = @app_info[:name]
+    
+    = csrf_meta_tags
+    = csp_meta_tag
+    
+    = stylesheet_link_tag "application", "data-turbo-track": "reload"
+    = javascript_importmap_tags
+  
+  body.min-h-screen.bg-gray-50.flex.flex-col
+    header.bg-white.shadow-sm.border-b
+      .container.mx-auto.px-4.py-6
+        h1.text-3xl.font-bold.text-gray-900
+          = @app_info[:name]
+        p.text-gray-600.mt-2
+          | Modern Rails 8 Application Template
+    
+    main.flex-1.container.mx-auto.px-4.py-8
+      .max-w-4xl.mx-auto
+        .grid.gap-6.md:grid-cols-2
+          // App Information Card
+          .bg-white.rounded-lg.shadow.p-6
+            h2.text-xl.font-semibold.text-gray-900.mb-4
+              | Application Info
+            .space-y-3
+              .flex.justify-between
+                span.font-medium.text-gray-600 Version:
+                code.text-sm.bg-gray-100.px-2.py-1.rounded
+                  = @app_info[:version]
+              .flex.justify-between
+                span.font-medium.text-gray-600 Environment:
+                span.capitalize class=("text-green-600" if Rails.env.development?)
+                  = @app_info[:environment]
+              .flex.justify-between
+                span.font-medium.text-gray-600 Ruby:
+                code.text-sm.bg-gray-100.px-2.py-1.rounded
+                  = @app_info[:ruby_version]
+              .flex.justify-between
+                span.font-medium.text-gray-600 Rails:
+                code.text-sm.bg-gray-100.px-2.py-1.rounded
+                  = @app_info[:rails_version]
+          
+          // Getting Started Card  
+          .bg-white.rounded-lg.shadow.p-6
+            h2.text-xl.font-semibold.text-gray-900.mb-4
+              | Getting Started
+            .space-y-4
+              p.text-gray-600
+                | Your Rails 8 application is ready! Here are some next steps:
+              ul.space-y-2.text-sm
+                li.flex.items-start
+                  span.text-green-500.mr-2 ✅
+                  | Dev environment is configured
+                li.flex.items-start
+                  span.text-green-500.mr-2 ✅
+                  | Database is set up and running
+                li.flex.items-start
+                  span.text-green-500.mr-2 ✅
+                  | JavaScript bundling with esbuild
+                li.flex.items-start
+                  span.text-green-500.mr-2 ✅
+                  | Testing framework ready (RSpec)
+                li.flex.items-start
+                  span.text-green-500.mr-2 ✅
+                  | Security scanning enabled
+        
+        // Quick Actions
+        .mt-8.bg-white.rounded-lg.shadow.p-6
+          h2.text-xl.font-semibold.text-gray-900.mb-4
+            | Quick Actions
+          .grid.gap-4.sm:grid-cols-2.lg:grid-cols-4
+            = link_to "/rails/info", class: "block p-4 border rounded-lg hover:bg-gray-50 transition-colors" do
+              .text-center
+                .text-2xl.mb-2 🛠️
+                .font-medium Rails Info
+                .text-sm.text-gray-600 View Rails configuration
+            
+            = link_to version_path, class: "block p-4 border rounded-lg hover:bg-gray-50 transition-colors" do
+              .text-center
+                .text-2xl.mb-2 📊
+                .font-medium Version API
+                .text-sm.text-gray-600 JSON version endpoint
+            
+            a href="https://github.com/Mattbot/rails_8_template" target="_blank" class="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+              .text-center
+                .text-2xl.mb-2 📚
+                .font-medium Template Docs
+                .text-sm.text-gray-600 View documentation
+            
+            a href="https://guides.rubyonrails.org/getting_started.html" target="_blank" class="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+              .text-center
+                .text-2xl.mb-2 🚀
+                .font-medium Rails Guides
+                .text-sm.text-gray-600 Official documentation
+    
+    footer.bg-gray-800.text-white.py-6
+      .container.mx-auto.px-4.text-center
+        p.text-gray-400
+          | Built with 
+          a href="https://rubyonrails.org" class="text-blue-400 hover:text-blue-300" Rails 8
+          |  • 
+          a href="https://github.com/Mattbot/rails_8_template" class="text-blue-400 hover:text-blue-300" Template Repository
