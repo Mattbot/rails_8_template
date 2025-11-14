@@ -9,7 +9,7 @@ html lang="en"
     = csp_meta_tag
 
     = stylesheet_link_tag "application", "data-turbo-track": "reload"
-    = javascript_importmap_tags
+    = javascript_include_tag "application", "data-turbo-track": "reload", type: "module"
 
   body.min-h-screen.bg-gray-50.flex.flex-col
     header.bg-white.shadow-sm.border-b

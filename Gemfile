@@ -81,4 +81,5 @@ group :test do
   gem "selenium-webdriver"
 
   # User added. Keep sorted:
+  gem "rails-controller-testing"
 end

@@ -8,7 +8,37 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 # that will avoid rails generators crashing because migrations haven't been run yet
 # return unless Rails.env.test?
 require 'rspec/rails'
+require 'rails-controller-testing'
 # Add additional requires below this line. Rails is not loaded until this point!
+
+# Configure Capybara for system tests
+require 'capybara/rspec'
+require 'selenium-webdriver'
+
+# Configure Capybara to work in dev container environment
+Capybara.configure do |config|
+  config.default_max_wait_time = 5
+  config.default_driver = :rack_test
+  config.javascript_driver = :headless_chrome
+end
+
+# Configure system test driver
+Capybara.register_driver :headless_chrome do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  
+  options.add_argument('--headless=new')
+  options.add_argument('--no-sandbox')
+  options.add_argument('--disable-dev-shm-usage')
+  options.add_argument('--disable-gpu')
+  options.add_argument('--disable-software-rasterizer')
+  options.add_argument('--window-size=1400,1400')
+  options.add_argument('--single-process')
+  
+  # Use chromium binary in dev container
+  options.binary = '/usr/bin/chromium'
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -35,6 +65,11 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 RSpec.configure do |config|
+  # Include rails-controller-testing helpers
+  config.include Rails::Controller::Testing::TestProcess
+  config.include Rails::Controller::Testing::TemplateAssertions
+  config.include Rails::Controller::Testing::Integration
+  
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')

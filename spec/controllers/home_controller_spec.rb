@@ -10,7 +10,7 @@ RSpec.describe HomeController, type: :controller do
     it "assigns app_info" do
       get :index
       expect(assigns(:app_info)).to be_present
-      expect(assigns(:app_info)[:name]).to eq(Rails.application.class.parent.name)
+      expect(assigns(:app_info)[:name]).to eq(Rails.application.class.module_parent.name)
       expect(assigns(:app_info)[:version]).to eq(APP_VERSION)
     end
   end
