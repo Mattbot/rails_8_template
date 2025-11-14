@@ -1,6 +1,6 @@
 {
   "name": "rails-8-template",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Modern Rails 8 application template with esbuild, Slim templates, security scanning, and development automation",
   "private": true,
   "scripts": {
