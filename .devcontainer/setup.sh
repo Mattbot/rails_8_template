@@ -34,6 +34,10 @@ fi
 echo "📦 Running Rails setup..."
 bin/setup --skip-server
 
+# Install git hooks for linting and other checks
+echo "🪝 Installing git hooks..."
+bin/install-hooks
+
 # Install JavaScript dependencies if package.json exists
 if [ -f "package.json" ]; then
     echo "📦 Installing JavaScript dependencies..."

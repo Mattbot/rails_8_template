@@ -4,13 +4,13 @@ html lang="en"
     meta charset="utf-8"
     meta name="viewport" content="width=device-width, initial-scale=1"
     title = @app_info[:name]
-    
+
     = csrf_meta_tags
     = csp_meta_tag
-    
+
     = stylesheet_link_tag "application", "data-turbo-track": "reload"
     = javascript_importmap_tags
-  
+
   body.min-h-screen.bg-gray-50.flex.flex-col
     header.bg-white.shadow-sm.border-b
       .container.mx-auto.px-4.py-6
@@ -18,7 +18,7 @@ html lang="en"
           = @app_info[:name]
         p.text-gray-600.mt-2
           | Modern Rails 8 Application Template
-    
+
     main.flex-1.container.mx-auto.px-4.py-8
       .max-w-4xl.mx-auto
         .grid.gap-6.md:grid-cols-2
@@ -43,8 +43,8 @@ html lang="en"
                 span.font-medium.text-gray-600 Rails:
                 code.text-sm.bg-gray-100.px-2.py-1.rounded
                   = @app_info[:rails_version]
-          
-          // Getting Started Card  
+
+          // Getting Started Card
           .bg-white.rounded-lg.shadow.p-6
             h2.text-xl.font-semibold.text-gray-900.mb-4
               | Getting Started
@@ -67,40 +67,46 @@ html lang="en"
                 li.flex.items-start
                   span.text-green-500.mr-2 ✅
                   | Security scanning enabled
-        
+
         // Quick Actions
         .mt-8.bg-white.rounded-lg.shadow.p-6
           h2.text-xl.font-semibold.text-gray-900.mb-4
             | Quick Actions
           .grid.gap-4.sm:grid-cols-2.lg:grid-cols-4
-            = link_to "/rails/info", class: "block p-4 border rounded-lg hover:bg-gray-50 transition-colors" do
+            = link_to "/rails/info", \
+              class: "block p-4 border rounded-lg hover:bg-gray-50 transition-colors" do
               .text-center
                 .text-2xl.mb-2 🛠️
                 .font-medium Rails Info
                 .text-sm.text-gray-600 View Rails configuration
-            
-            = link_to version_path, class: "block p-4 border rounded-lg hover:bg-gray-50 transition-colors" do
+
+            = link_to version_path, \
+              class: "block p-4 border rounded-lg hover:bg-gray-50 transition-colors" do
               .text-center
                 .text-2xl.mb-2 📊
                 .font-medium Version API
                 .text-sm.text-gray-600 JSON version endpoint
-            
-            a href="https://github.com/Mattbot/rails_8_template" target="_blank" class="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+
+            a href="https://github.com/Mattbot/rails_8_template" target="_blank" \
+              class="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
               .text-center
                 .text-2xl.mb-2 📚
                 .font-medium Template Docs
                 .text-sm.text-gray-600 View documentation
-            
-            a href="https://guides.rubyonrails.org/getting_started.html" target="_blank" class="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+
+            a href="https://guides.rubyonrails.org/getting_started.html" target="_blank" \
+              class="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
               .text-center
                 .text-2xl.mb-2 🚀
                 .font-medium Rails Guides
                 .text-sm.text-gray-600 Official documentation
-    
+
     footer.bg-gray-800.text-white.py-6
       .container.mx-auto.px-4.text-center
         p.text-gray-400
-          | Built with 
-          a href="https://rubyonrails.org" class="text-blue-400 hover:text-blue-300" Rails 8
-          |  • 
-          a href="https://github.com/Mattbot/rails_8_template" class="text-blue-400 hover:text-blue-300" Template Repository
+          | Built with
+          a href="https://rubyonrails.org" \
+            class="text-blue-400 hover:text-blue-300" Rails 8
+          | •
+          a href="https://github.com/Mattbot/rails_8_template" \
+            class="text-blue-400 hover:text-blue-300" Template Repository

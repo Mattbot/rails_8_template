@@ -1,0 +1,9 @@
+# Slim-Lint configuration
+# https://github.com/sds/slim-lint
+
+linters:
+  LineLength:
+    max: 120
+  
+  TrailingBlankLines:
+    enabled: false

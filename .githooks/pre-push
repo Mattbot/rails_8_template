@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Pre-push hook to run linter before pushing
+echo "🔍 Running linter before push..."
+
+# Run RuboCop
+if ! bundle exec rubocop; then
+    echo "❌ RuboCop lint check failed. Please fix the issues before pushing."
+    echo "💡 Tip: Run 'bundle exec rubocop -A' to auto-fix most issues."
+    exit 1
+fi
+
+# TODO: Re-enable slim-lint after fixing template issues
+# Run Slim-lint if slim files exist
+# if find . -name "*.slim" -not -path "./tmp/*" -not -path "./vendor/*" | grep -q .; then
+#     if ! bundle exec slim-lint app/views/; then
+#         echo "❌ Slim-lint check failed. Please fix the issues before pushing."
+#         exit 1
+#     fi
+# fi
+
+echo "✅ All lint checks passed! Proceeding with push."
+exit 0
