@@ -34,8 +34,12 @@ Capybara.register_driver :headless_chrome do |app|
   options.add_argument('--window-size=1400,1400')
   options.add_argument('--single-process')
 
-  # Use chromium binary in dev container
-  options.binary = '/usr/bin/chromium'
+  # Detect and use appropriate Chrome binary for environment
+  if File.exist?('/usr/bin/chromium')
+    options.binary = '/usr/bin/chromium'  # Dev container
+  elsif File.exist?('/usr/bin/google-chrome')
+    options.binary = '/usr/bin/google-chrome'  # CI environment
+  end
 
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
 end
