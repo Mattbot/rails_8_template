@@ -1,12 +1,26 @@
 #!/bin/bash
 
 # Pre-push hook to run linter before pushing
+
+# Skip linting for Dependabot commits
+if git log -1 --pretty=%an | grep -q "dependabot\[bot\]"; then
+    echo "🤖 Dependabot push detected, skipping lint checks"
+    exit 0
+fi
+
+# Skip linting if SKIP_LINT environment variable is set
+if [ "$SKIP_LINT" = "true" ]; then
+    echo "⏭️  Skipping lint checks (SKIP_LINT=true)"
+    exit 0
+fi
+
 echo "🔍 Running linter before push..."
 
 # Run RuboCop
 if ! bundle exec rubocop; then
     echo "❌ RuboCop lint check failed. Please fix the issues before pushing."
     echo "💡 Tip: Run 'bundle exec rubocop -A' to auto-fix most issues."
+    echo "💡 Or set SKIP_LINT=true to skip this check"
     exit 1
 fi
 
