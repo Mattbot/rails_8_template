@@ -32,6 +32,13 @@ Capybara.register_driver :headless_chrome do |app|
   options.add_argument('--disable-software-rasterizer')
   options.add_argument('--window-size=1400,1400')
   options.add_argument('--single-process')
+  options.add_argument('--disable-extensions')
+  options.add_argument('--disable-background-timer-throttling')
+  options.add_argument('--disable-backgrounding-occluded-windows')
+  options.add_argument('--disable-renderer-backgrounding')
+  options.add_argument('--disable-features=TranslateUI')
+  options.add_argument('--disable-ipc-flooding-protection')
+  options.add_argument('--remote-debugging-port=9222')
 
   # Check if Docker Selenium is available via environment variable
   selenium_host = ENV.fetch('SELENIUM_HOST', 'selenium')
