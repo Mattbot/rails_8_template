@@ -3,10 +3,9 @@ set -e
 
 echo "🚀 Starting Rails 8 + esbuild Dev Container setup..."
 
-# Install system dependencies for testing
-echo "🧪 Installing system dependencies for testing..."
+# Install basic system dependencies
+echo "📦 Installing basic system dependencies..."
 sudo apt-get update -qq
-sudo apt-get install -y chromium chromium-driver
 
 # Fix SSH directory ownership if it exists (mounted SSH keys create root-owned directories)
 # This is necessary because Docker mount operations create parent directories as root

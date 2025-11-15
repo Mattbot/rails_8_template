@@ -22,10 +22,9 @@ Capybara.configure do |config|
   config.javascript_driver = :headless_chrome
 end
 
-# Configure system test driver
+# Configure system test driver with environment detection
 Capybara.register_driver :headless_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
-
   options.add_argument('--headless=new')
   options.add_argument('--no-sandbox')
   options.add_argument('--disable-dev-shm-usage')
@@ -34,14 +33,36 @@ Capybara.register_driver :headless_chrome do |app|
   options.add_argument('--window-size=1400,1400')
   options.add_argument('--single-process')
 
-  # Detect and use appropriate Chrome binary for environment
-  if File.exist?('/usr/bin/chromium')
-    options.binary = '/usr/bin/chromium'  # Dev container
-  elsif File.exist?('/usr/bin/google-chrome')
-    options.binary = '/usr/bin/google-chrome'  # CI environment
+  # Check if Docker Selenium is available via environment variable
+  selenium_host = ENV.fetch('SELENIUM_HOST', 'selenium')
+  if ENV['SELENIUM_HOST'] || system("nc -z #{selenium_host} 4444 2>/dev/null")
+    # Use Docker Selenium service
+    Capybara::Selenium::Driver.new(
+      app,
+      browser: :remote,
+      url: "http://#{selenium_host}:4444/wd/hub",
+      options: options
+    )
+  else
+    # Use local Chrome for CI or when Docker Selenium isn't available
+    if File.exist?('/usr/bin/chromium')
+      options.binary = '/usr/bin/chromium'
+    elsif File.exist?('/usr/bin/google-chrome')
+      options.binary = '/usr/bin/google-chrome'
+    end
+    
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
   end
+end
 
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+# Configure Capybara networking only for Docker setup
+selenium_host = ENV.fetch('SELENIUM_HOST', 'selenium')
+if ENV['SELENIUM_HOST'] || system("nc -z #{selenium_host} 4444 2>/dev/null")
+  Capybara.configure do |config|
+    config.server_host = '0.0.0.0'  # Bind to all interfaces
+    config.server_port = 9887        # Use a specific port
+    config.app_host = "http://#{`hostname -i`.strip}:#{config.server_port}"  # Use container IP
+  end
 end
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
