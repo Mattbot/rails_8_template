@@ -5,7 +5,7 @@
 [![Version Bump](https://github.com/Mattbot/rails_8_template/workflows/Auto%20Version%20Bump/badge.svg)](https://github.com/Mattbot/rails_8_template/actions/workflows/version-bump.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Ruby](https://img.shields.io/badge/ruby-3.4.6-red.svg)](https://www.ruby-lang.org/)
-[![Rails](https://img.shields.io/badge/rails-8.0.3-red.svg)](https://rubyonrails.org/)
+[![Rails](https://img.shields.io/badge/rails-8.1.1-red.svg)](https://rubyonrails.org/)
 
 **A modern, production-ready Rails 8 template for rapid application development.**
 
