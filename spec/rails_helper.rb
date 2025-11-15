@@ -50,7 +50,7 @@ Capybara.register_driver :headless_chrome do |app|
     elsif File.exist?('/usr/bin/google-chrome')
       options.binary = '/usr/bin/google-chrome'
     end
-    
+
     Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
   end
 end
