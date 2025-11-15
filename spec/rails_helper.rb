@@ -45,6 +45,7 @@ Capybara.register_driver :headless_chrome do |app|
     )
   else
     # Use local Chrome for CI or when Docker Selenium isn't available
+    # Prioritize chromium for local dev, Chrome for CI
     if File.exist?('/usr/bin/chromium')
       options.binary = '/usr/bin/chromium'
     elsif File.exist?('/usr/bin/google-chrome')

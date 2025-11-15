@@ -61,20 +61,20 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
-        ruby-version: ['3.4.6', '3.3.0']
-        node-version: ['20', '22']
+        ruby-version: ["3.4.6", "3.3.0"]
+        node-version: ["20", "22"]
         include:
-          - ruby-version: '3.4.6'
-            node-version: '20'
+          - ruby-version: "3.4.6"
+            node-version: "20"
             primary: true
       fail-fast: false
 
     steps:
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config google-chrome-stable chromium-driver
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config google-chrome-stable
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -89,7 +89,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install JavaScript dependencies
         run: npm ci
