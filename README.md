@@ -194,7 +194,7 @@ git push # Will run linter first
 
 ```bash
 # Update vulnerability database and check
-rake security:check
+rake security:audit
 
 # Just update the database
 rake security:update
@@ -524,7 +524,7 @@ This application includes automated security vulnerability scanning using `bundl
 
 ```bash
 # Full security check with database update
-rake security:check
+rake security:audit
 
 # Update vulnerability database only
 rake security:update
