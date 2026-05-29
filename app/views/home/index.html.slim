@@ -73,15 +73,13 @@ html lang="en"
           h2.text-xl.font-semibold.text-gray-900.mb-4
             | Quick Actions
           .grid.gap-4.sm:grid-cols-2.lg:grid-cols-4
-            = link_to "/rails/info", \
-              class: "block p-4 border rounded-lg hover:bg-gray-50 transition-colors" do
+            = link_to "/rails/info", class: "block p-4 border rounded-lg hover:bg-gray-50 transition-colors" do
               .text-center
                 .text-2xl.mb-2 🛠️
                 .font-medium Rails Info
                 .text-sm.text-gray-600 View Rails configuration
 
-            = link_to version_path, \
-              class: "block p-4 border rounded-lg hover:bg-gray-50 transition-colors" do
+            = link_to version_path, class: "block p-4 border rounded-lg hover:bg-gray-50 transition-colors" do
               .text-center
                 .text-2xl.mb-2 📊
                 .font-medium Version API
