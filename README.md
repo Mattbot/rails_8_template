@@ -230,12 +230,19 @@ export JWT_SECRET="replace-with-a-long-random-secret"
 
 **Controller concern:**
 
-- `JwtAuthenticatable` is included in `ApplicationController`
-- Add `before_action :authenticate_jwt_token!` in controllers where JWT auth is required
+- Include `JwtAuthenticatable` in API controllers where JWT auth is required
+- Add `before_action :authenticate_jwt_token!` in controllers that require bearer token auth
 - Read decoded claims from `current_jwt_payload`
+- Default API namespace is `/api/v1`
+
+**Default API endpoints:**
+
+- `GET /api/v1` - Returns API status, app version, git hash, and timestamp
+- `GET /api/v1/health` - Returns basic API health status
+- `GET /api/v1/version` - Returns app version, git hash, and timestamp
 
 ```ruby
-class ApiController < ApplicationController
+class Api::V1::ProfilesController < Api::V1::BaseController
    before_action :authenticate_jwt_token!
 
    def profile
@@ -243,6 +250,20 @@ class ApiController < ApplicationController
    end
 end
 ```
+
+### ActiveAdmin
+
+ActiveAdmin is available at `/admin` and uses a separate `AdminUser` Devise login.
+
+**Bootstrap admin user:**
+
+```bash
+export ADMIN_EMAIL="admin@example.com"
+export ADMIN_PASSWORD="replace-with-a-strong-password"
+bin/rails db:seed
+```
+
+Then visit `/admin` and sign in with those credentials.
 
 ### Dev Containers
 
@@ -328,23 +349,33 @@ The current version is stored in the `VERSION` file and accessible throughout th
 rake version:show
 
 # Access in Rails console
-APP_VERSION            # => "1.0.0"
-AppVersion.current     # => "1.0.0"
+APP_VERSION            # => "1.3.0"
+AppVersion.current     # => "1.3.0"
+AppVersion.git_hash    # => "<short git hash>"
 AppVersion.major       # => 1
-AppVersion.minor       # => 0
+AppVersion.minor       # => 3
 AppVersion.patch       # => 0
 ```
 
 ### Version Endpoints
 
-**Health Check Endpoint:**
+**Version endpoint:**
 
-- `GET /version` - Returns JSON with current version and timestamp
+- `GET /version` - Returns JSON with current version, git hash, and timestamp
 - Useful for monitoring, debugging, and deployment verification
 
 ```bash
 curl http://localhost:3000/version
-# => {"version":"1.0.0","timestamp":"2025-11-04 19:47:17 UTC"}
+# => {"version":"1.3.0","git_hash":"<short git hash>","timestamp":"<utc timestamp>"}
+```
+
+**API version endpoint:**
+
+- `GET /api/v1/version` - Returns the same version metadata for API clients
+
+```bash
+curl http://localhost:3000/api/v1/version
+# => {"version":"1.3.0","git_hash":"<short git hash>","timestamp":"<utc timestamp>"}
 ```
 
 ### Version Bumping

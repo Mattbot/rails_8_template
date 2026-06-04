@@ -26,6 +26,20 @@ module AppVersion
   def self.to_s
     current
   end
+
+  def self.git_hash
+    @git_hash ||= begin
+      env_hash = ENV["GIT_HASH"].to_s.strip
+      if env_hash.empty?
+        hash = `git rev-parse --short HEAD 2>/dev/null`.to_s.strip
+        hash.empty? ? "unknown" : hash
+      else
+        env_hash
+      end
+    rescue StandardError
+      "unknown"
+    end
+  end
 end
 
 # Make version available as a constant

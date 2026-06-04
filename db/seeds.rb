@@ -7,3 +7,14 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+admin_email = ENV.fetch("ADMIN_EMAIL", "admin@example.com")
+admin_password = ENV.fetch("ADMIN_PASSWORD", Rails.env.development? ? "password" : "")
+
+if admin_password.blank?
+  warn "Skipping AdminUser seed: set ADMIN_PASSWORD to seed an admin account"
+else
+  AdminUser.find_or_create_by!(email: admin_email) do |admin|
+    admin.password = admin_password
+    admin.password_confirmation = admin_password
+  end
+end
