@@ -2,6 +2,8 @@ require "rails_helper"
 
 RSpec.describe "JwtAuthenticatable", type: :controller do
   controller(ApplicationController) do
+    include JwtAuthenticatable
+
     before_action :authenticate_jwt_token!
 
     def index
