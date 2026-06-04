@@ -48,6 +48,7 @@ gem "uri", ">= 1.0.4"   # Fix CVE-2025-61594
 gem "slim-rails"
 
 # User added. Keep sorted:
+gem "jwt"
 gem "slim"
 
 group :development, :test do

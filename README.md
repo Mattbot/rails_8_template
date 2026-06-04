@@ -213,6 +213,37 @@ rake security:audit
 rake security:update
 ```
 
+### Optional JWT Support
+
+This template includes optional JWT support through a small wrapper service and controller concern.
+
+**Environment setup:**
+
+```bash
+export JWT_SECRET="replace-with-a-long-random-secret"
+```
+
+**Service wrapper:**
+
+- `JwtService.encode(payload)` creates a token with default `iat` and `exp` claims
+- `JwtService.decode(token)` verifies signature and expiration and returns payload
+
+**Controller concern:**
+
+- `JwtAuthenticatable` is included in `ApplicationController`
+- Add `before_action :authenticate_jwt_token!` in controllers where JWT auth is required
+- Read decoded claims from `current_jwt_payload`
+
+```ruby
+class ApiController < ApplicationController
+   before_action :authenticate_jwt_token!
+
+   def profile
+      render json: { sub: current_jwt_payload["sub"] }
+   end
+end
+```
+
 ### Dev Containers
 
 This Rails application includes a fully configured Dev Container that automatically handles all setup requirements. The configuration includes:
