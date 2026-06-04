@@ -72,8 +72,15 @@ This is the easiest way to get started. The Dev Container is fully configured to
    - Wait for the container to build and setup to complete (first time only)
 
 3. **Start developing**
+
    ```bash
    ./bin/dev
+   ```
+
+   To skip the startup security audit for a single session:
+
+   ```bash
+   ./bin/dev --no-security
    ```
 
 **What happens automatically:**
@@ -145,6 +152,12 @@ The following additional features have been added to the Rails 8 base install:
 
 ```bash
 ./bin/dev
+```
+
+**Start development server without the startup security check:**
+
+```bash
+./bin/dev --no-security
 ```
 
 **Run Rails server only:**
@@ -517,8 +530,10 @@ This application includes automated security vulnerability scanning using `bundl
 **During Development:**
 
 - Security check runs automatically when starting `./bin/dev`
+- Use `./bin/dev --no-security` to skip the startup security check for a session
+- The startup audit runs once, then remains idle so the rest of the dev stack stays up
 - Vulnerability database is updated and checked during Dev Container setup
-- Continuous monitoring alerts you to new vulnerabilities
+- Manual `rake security:audit` checks are available whenever you want to re-run the scan
 
 **Available Commands:**
 
@@ -543,7 +558,7 @@ bundle exec bundle-audit check
 **Integration Points:**
 
 - ✅ **Dev Container setup**: Automatic vulnerability check on first run
-- ✅ **Development server**: Continuous monitoring via `./bin/dev`
+- ✅ **Development server**: One startup audit via `./bin/dev`
 - ✅ **Rake tasks**: Easy manual testing and CI/CD integration
 - ✅ **CI/CD ready**: Exit codes for automated pipeline failures
 

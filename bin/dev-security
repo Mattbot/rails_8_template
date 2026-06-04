@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+set -eu
+
+initial_delay="${SECURITY_AUDIT_INITIAL_DELAY:-30}"
+audit_command="${SECURITY_AUDIT_COMMAND:-bundle exec bundle-audit check --update}"
+
+echo "[security] waiting ${initial_delay}s before first audit"
+sleep "$initial_delay"
+
+echo "[security] running dependency audit"
+
+if ! sh -c "$audit_command"; then
+  exit 1
+fi
+
+echo "[security] audit passed; remaining idle"
+exec tail -f /dev/null

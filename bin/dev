@@ -1,11 +1,43 @@
 #!/usr/bin/env sh
 
+set -eu
+
 if gem list --no-installed --exact --silent foreman; then
   echo "Installing foreman..."
   gem install foreman
 fi
 
+disable_security_check="${DISABLE_SECURITY_CHECK:-0}"
+app_root="$(pwd -P)"
+procfile_dir="./dev/tmp/procfiles"
+
+if [ "${1:-}" = "--no-security" ]; then
+  disable_security_check=1
+  shift
+fi
+
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
-exec foreman start -f Procfile.dev --env /dev/null "$@"
+procfile="Procfile.dev"
+
+if [ "$disable_security_check" = "1" ]; then
+  mkdir -p "$procfile_dir"
+  procfile="$(mktemp "$procfile_dir/Procfile.dev.XXXXXX")"
+  awk -v root="$app_root" '
+    $0 !~ /^security:/ {
+      separator = index($0, ":")
+      name = substr($0, 1, separator - 1)
+      command = substr($0, separator + 1)
+      sub(/^[[:space:]]*/, "", command)
+      printf "%s: cd \"%s\" && %s\n", name, root, command
+    }
+  ' Procfile.dev > "$procfile"
+  trap 'rm -f "$procfile"' EXIT INT TERM
+fi
+
+if [ "$procfile" = "Procfile.dev" ]; then
+  exec foreman start -f "$procfile" --env /dev/null "$@"
+fi
+
+foreman start -f "$procfile" --env /dev/null "$@"
