@@ -118,6 +118,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [rubocop, slim_lint, brakeman, bundle_audit]
     if: always() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     
     steps:
       - name: Download all artifacts
